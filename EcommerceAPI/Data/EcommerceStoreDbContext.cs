@@ -67,11 +67,14 @@ namespace EcommerceAPI.Data
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.HasKey(p => p.ProductId);
+                entity.Property(p => p.ProductId).ValueGeneratedOnAdd();
                 entity.Property(p => p.Name).IsRequired().HasMaxLength(150).IsUnicode(false);
                 entity.Property(p => p.Price).HasPrecision(18, 2);
                 entity.Property(p => p.StockQuantity).HasDefaultValue(0);
                 entity.Property(p => p.ImageUrl).HasMaxLength(500).IsUnicode(false);
-                entity.Property(p => p.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(p => p.CreatedAt)
+                      .ValueGeneratedOnAdd()
+                      .HasDefaultValueSql("GETDATE()");
 
                 // Product -> Category (Many-to-One)
                 entity.HasOne(p => p.Category)
