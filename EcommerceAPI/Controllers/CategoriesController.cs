@@ -24,6 +24,7 @@ public class CategoriesController : ControllerBase
             {
                 category.CategoryId,
                 category.Name,
+                category.Description,
                 category.IsActive
             })
             .ToListAsync();

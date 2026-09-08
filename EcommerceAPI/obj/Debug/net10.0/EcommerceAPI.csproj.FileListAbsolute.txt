@@ -2417,3 +2417,4 @@ C:\eCommercePortal\EcommerceAPI\bin\RegistrationFixValidation\runtimes\win-arm64
 C:\eCommercePortal\EcommerceAPI\bin\RegistrationFixValidation\runtimes\win-x64\native\msalruntime.dll
 C:\eCommercePortal\EcommerceAPI\bin\RegistrationFixValidation\runtimes\win-x86\native\msalruntime_x86.dll
 C:\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\EcommerceAPI.staticwebassets.runtime.json
+C:\eCommercePortal\EcommerceAPI\obj\Debug\net10.0\EcommerceAPI.sourcelink.json
