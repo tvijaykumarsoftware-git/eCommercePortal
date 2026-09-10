@@ -3786,11 +3786,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\eCommercePortal\\EcommerceAPI\\EcommerceAPI.csproj",
+      "projectUniqueName": "C:\\ReactJs\\eCommercePortal\\EcommerceAPI\\EcommerceAPI.csproj",
       "projectName": "EcommerceAPI",
-      "projectPath": "C:\\eCommercePortal\\EcommerceAPI\\EcommerceAPI.csproj",
+      "projectPath": "C:\\ReactJs\\eCommercePortal\\EcommerceAPI\\EcommerceAPI.csproj",
       "packagesPath": "C:\\Users\\Hi\\.nuget\\packages\\",
-      "outputPath": "C:\\eCommercePortal\\EcommerceAPI\\obj\\",
+      "outputPath": "C:\\ReactJs\\eCommercePortal\\EcommerceAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -28,7 +28,7 @@ public class ProductsController : ControllerBase
             {
                 product.ProductId,
                 product.CategoryId,
-                CategoryName = product.Category.Name,
+                CategoryName = product.Category!.Name,
                 product.Name,
                 product.Description,
                 product.Price,
@@ -49,7 +49,7 @@ public class ProductsController : ControllerBase
             {
                 product.ProductId,
                 product.CategoryId,
-                CategoryName = product.Category.Name,
+                CategoryName = product.Category!.Name,
                 product.Name,
                 product.Description,
                 product.Price,
