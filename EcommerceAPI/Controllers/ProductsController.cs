@@ -33,7 +33,9 @@ public class ProductsController : ControllerBase
                 product.Description,
                 product.Price,
                 product.StockQuantity,
-                product.ImageUrl
+                product.ImageUrl,
+                product.PlatformFee,
+                product.DiscountOnMRP
             });
 
         return await products.ToListAsync();
@@ -54,7 +56,9 @@ public class ProductsController : ControllerBase
                 product.Description,
                 product.Price,
                 product.StockQuantity,
-                product.ImageUrl
+                product.ImageUrl,
+                product.PlatformFee,
+                product.DiscountOnMRP
             })
             .SingleOrDefaultAsync();
 
@@ -99,6 +103,8 @@ public class ProductsController : ControllerBase
         existingProduct.Price = product.Price;
         existingProduct.StockQuantity = product.StockQuantity;
         existingProduct.ImageUrl = product.ImageUrl;
+        existingProduct.PlatformFee = product.PlatformFee;
+        existingProduct.DiscountOnMRP = product.DiscountOnMRP;
         await _context.SaveChangesAsync();
         return NoContent();
     }

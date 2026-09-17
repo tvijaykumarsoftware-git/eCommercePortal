@@ -31,5 +31,16 @@ namespace EcommerceAPI.Models
         // Foreign Key Navigation
         [ForeignKey(nameof(OrderId))]
         public Order Order { get; set; } = null!;
+        [StringLength(100)]
+        public string? VendorName { get; set; }
+
+        [StringLength(20)]
+        public string? CardNumber { get; set; }
+
+        [StringLength(10)]
+        public string? CardExp { get; set; }
+
+        [StringLength(4)]
+        public string? CardCvv { get; set; }
     }
 }

@@ -35,9 +35,12 @@ namespace EcommerceAPI.Controllers
                     item.ProductId,
                     item.Quantity,
                     ProductName = item.Product.Name,
+                    PlatformFee = item.Product.PlatformFee ?? 0,
+                    DiscountOnMRP = item.Product.DiscountOnMRP ?? 0,
                     item.Product.Price,
                     item.Product.ImageUrl,
-                    item.Product.StockQuantity
+                    item.Product.StockQuantity,
+                    
                 })
                 .ToListAsync();
         }

@@ -28,6 +28,12 @@ namespace EcommerceAPI.Models
     public string? ImageUrl { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    // Added Missing Columns
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal? PlatformFee { get; set; }
+
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal? DiscountOnMRP { get; set; }
 
     // Foreign Key Navigation
     [ForeignKey(nameof(CategoryId))]
