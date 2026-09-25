@@ -116,10 +116,12 @@ namespace EcommerceAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto dto)
         {
+            var email = dto.Email.Trim();
+
             // 1. Fetch user including Role details
             var user = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             if (user == null || !user.IsActive)
             {
