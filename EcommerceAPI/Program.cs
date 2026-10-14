@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 using EcommerceAPI.Data;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,12 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+// Replace with your actual Key Vault URI
+var keyVaultUri = new Uri("https://ecommerceapi-keyvault.vault.azure.net/");
+
+// Add Azure Key Vault to the configuration pipeline
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
 
 // 4.  Add Application Insights Telemetry
 

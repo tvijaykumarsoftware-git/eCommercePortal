@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "wGLMXEUxBPU=",
+  "dgSpecHash": "m2ryfau2YxU=",
   "success": true,
   "projectFilePath": "D:\\ReactJs\\eCommercePortal\\EcommerceAPI\\EcommerceAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Dorimon\\.nuget\\packages\\azure.core\\1.63.0\\azure.core.1.63.0.nupkg.sha512",
-    "C:\\Users\\Dorimon\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
+    "C:\\Users\\Dorimon\\.nuget\\packages\\azure.extensions.aspnetcore.configuration.secrets\\1.5.2\\azure.extensions.aspnetcore.configuration.secrets.1.5.2.nupkg.sha512",
+    "C:\\Users\\Dorimon\\.nuget\\packages\\azure.identity\\1.21.0\\azure.identity.1.21.0.nupkg.sha512",
     "C:\\Users\\Dorimon\\.nuget\\packages\\azure.monitor.opentelemetry.exporter\\1.10.0\\azure.monitor.opentelemetry.exporter.1.10.0.nupkg.sha512",
+    "C:\\Users\\Dorimon\\.nuget\\packages\\azure.security.keyvault.secrets\\4.11.0\\azure.security.keyvault.secrets.4.11.0.nupkg.sha512",
     "C:\\Users\\Dorimon\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Dorimon\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Dorimon\\.nuget\\packages\\microsoft.applicationinsights\\3.2.0\\microsoft.applicationinsights.3.2.0.nupkg.sha512",
