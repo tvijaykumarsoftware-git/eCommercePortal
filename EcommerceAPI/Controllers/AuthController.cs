@@ -113,7 +113,7 @@ namespace EcommerceAPI.Controllers
             });
         }
 
-        [HttpPost("login")]
+[HttpPost("login")]
 public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto dto)
 {
     var email = dto.Email.Trim().ToLower();
