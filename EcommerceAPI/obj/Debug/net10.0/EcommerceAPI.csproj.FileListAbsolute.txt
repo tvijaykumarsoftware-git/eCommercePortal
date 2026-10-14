@@ -344,3 +344,13 @@ C:\ReactJs\eCommercePortal\EcommerceAPI\obj\Debug\net10.0\refint\EcommerceAPI.dl
 C:\ReactJs\eCommercePortal\EcommerceAPI\obj\Debug\net10.0\EcommerceAPI.pdb
 C:\ReactJs\eCommercePortal\EcommerceAPI\obj\Debug\net10.0\EcommerceAPI.genruntimeconfig.cache
 C:\ReactJs\eCommercePortal\EcommerceAPI\obj\Debug\net10.0\ref\EcommerceAPI.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\EcommerceAPI.exe
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\EcommerceAPI.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Microsoft.OpenApi.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\ReactJs\eCommercePortal\EcommerceAPI\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
