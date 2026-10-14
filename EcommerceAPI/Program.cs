@@ -70,7 +70,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// 4. Configure CORS
+// 4.  Add Application Insights Telemetry
+
+builder.Services.AddApplicationInsightsTelemetry();
+
+// 5. Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactDevelopment", policy =>
