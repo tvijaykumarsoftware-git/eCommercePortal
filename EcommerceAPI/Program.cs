@@ -71,15 +71,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Replace with your actual Key Vault URI
-var keyVaultUri = new Uri("https://ecommerceapi-keyvault.vault.azure.net/");
-
-// Add Azure Key Vault to the configuration pipeline
-builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
-
-// 4.  Add Application Insights Telemetry
-
-builder.Services.AddApplicationInsightsTelemetry();
 
 // 5. Configure CORS
 builder.Services.AddCors(options =>
@@ -92,6 +83,17 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+/*// Replace with your actual Key Vault URI
+var keyVaultUri = new Uri("https://ecommerceapi-keyvault.vault.azure.net/");
+
+// Add Azure Key Vault to the configuration pipeline
+builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+
+// 4.  Add Application Insights Telemetry
+
+builder.Services.AddApplicationInsightsTelemetry();*/
+
 
 var app = builder.Build();
 
