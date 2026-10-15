@@ -113,41 +113,54 @@ namespace EcommerceAPI.Controllers
             });
         }
 
-        [HttpPost("login")]
-        public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto dto)
-        {
-            var email = dto.Email.Trim();
+[HttpPost("login")]
+public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto dto)
+{
+    var email = dto.Email.Trim().ToLower();
 
-            // 1. Fetch user including Role details
-            var user = await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == email);
+    // 1. Fetch user case-insensitively including Role details
+    var user = await _context.Users
+        .Include(u => u.Role)
+        .FirstOrDefaultAsync(u => u.Email.ToLower() == email);
 
-            if (user == null || !user.IsActive)
-            {
-                return Unauthorized(new { message = "Invalid email or account is inactive." });
-            }
+    // Provide specific feedback for debugging purposes
+    if (user == null)
+    {
+        return Unauthorized(new { message = "No user found with this email address." });
+    }
 
-            // 2. Verify password hash
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
-            if (!isPasswordValid)
-            {
-                return Unauthorized(new { message = "Invalid credentials." });
-            }
+    if (!user.IsActive)
+    {
+        return Unauthorized(new { message = "Your account is inactive." });
+    }
 
-            // 3. Generate JWT Token
-            var tokenString = GenerateJwtToken(user, out DateTime expiration);
+    // 2. Verify password hash
+    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
+    if (!isPasswordValid)
+    {
+        return Unauthorized(new { message = "Invalid password." });
+    }
 
-            return Ok(new AuthResponseDto
-            {
-                Token = tokenString,
-                UserName = $"{user.FirstName} {user.LastName}",
-                Email = user.Email,
-                ImageUrl = user.ImageUrl,
-                Role = user.Role.RoleName,
-                Expiration = expiration
-            });
-        }
+    // 3. Ensure Role is loaded properly
+    if (user.Role == null)
+    {
+        return StatusCode(500, new { message = "User role configuration error in database." });
+    }
+
+    // 4. Generate JWT Token
+    var tokenString = GenerateJwtToken(user, out DateTime expiration);
+
+    return Ok(new AuthResponseDto
+    {
+        Token = tokenString,
+        UserName = $"{user.FirstName} {user.LastName}",
+        Email = user.Email,
+        ImageUrl = user.ImageUrl,
+        Role = user.Role.RoleName,
+        Expiration = expiration
+    });
+}
+
 
         private string GenerateJwtToken(User user, out DateTime expiration)
         {
