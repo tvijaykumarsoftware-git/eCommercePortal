@@ -42,5 +42,14 @@ namespace EcommerceAPI.Models
 
         [StringLength(4)]
         public string? CardCvv { get; set; }
+
+         // --- New EMI Columns ---
+        public int? EmiTenure { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? EmiAmount { get; set; }
+
+        public DateTime? EmiDateOn { get; set; }
+       
     }
 }

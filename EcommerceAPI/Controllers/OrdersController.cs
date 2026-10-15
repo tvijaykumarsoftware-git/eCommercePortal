@@ -181,7 +181,7 @@ public async Task<IActionResult> RateOrder(int id, [FromBody] RateOrderRequest r
     }
 }
 
-        [HttpPost]
+ [HttpPost]
 public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest request)
 {
     var userId = GetUserId();
@@ -236,7 +236,7 @@ public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest reques
         _context.CartItems.RemoveRange(cartItems);
         await _context.SaveChangesAsync();
 
-        // 3. Create Transaction with payment provider details and 10-digit TXN reference
+        // 3. Create Transaction with payment details & EMI fields
         string provider = string.IsNullOrWhiteSpace(request.PaymentProvider) 
             ? "Credit / Debit Card" 
             : request.PaymentProvider;
@@ -254,7 +254,10 @@ public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest reques
             VendorName = request.VendorName,
             CardNumber = request.CardNumber,
             CardExp = request.CardExp,
-            CardCvv = request.CardCvv
+            CardCvv = request.CardCvv,
+            EmiTenure = request.EmiTenure,
+            EmiAmount = request.EmiAmount,
+            EmiDateOn = request.EmiDateOn
         };
 
         _context.Transactions.Add(paymentTransaction);
@@ -289,7 +292,10 @@ public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest reques
                 paymentTransaction.VendorName,
                 paymentTransaction.CardNumber,
                 paymentTransaction.CardExp,
-                paymentTransaction.CardCvv
+                paymentTransaction.CardCvv,
+                paymentTransaction.EmiTenure,
+                paymentTransaction.EmiAmount,
+                paymentTransaction.EmiDateOn
             },
             message = "Order placed successfully.",
             orderItems = order.OrderItems.Select(item => new
@@ -308,7 +314,6 @@ public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest reques
     }
 }
 
-
         private int? GetUserId()
         {
             var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -316,15 +321,18 @@ public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest reques
         }
     }
 
-    public class CreateOrderRequest
-    {
-        public string ShippingAddress { get; set; } = string.Empty;
-        public string PaymentProvider { get; set; } = "Credit / Debit Card";
-        public string? VendorName { get; set; }
-        public string? CardNumber { get; set; }
-        public string? CardExp { get; set; }
-        public string? CardCvv { get; set; }
-    }
+   public class CreateOrderRequest
+{
+    public string ShippingAddress { get; set; } = string.Empty;
+    public string PaymentProvider { get; set; } = "Credit / Debit Card";
+    public string? VendorName { get; set; }
+    public string? CardNumber { get; set; }
+    public string? CardExp { get; set; }
+    public string? CardCvv { get; set; }
+    public int? EmiTenure { get; set; }
+    public decimal? EmiAmount { get; set; }
+    public DateTime? EmiDateOn { get; set; }
+}
 
     public class UpdateStatusRequest
 {
