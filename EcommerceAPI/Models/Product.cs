@@ -49,5 +49,14 @@ namespace EcommerceAPI.Models
     [ValidateNever]
     [JsonIgnore]
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+    [StringLength(500)]
+    public string? BackImageUrl { get; set; }
+
+    [StringLength(500)]
+    public string? LeftImageUrl { get; set; }
+
+    [StringLength(500)]
+    public string? RightImageUrl { get; set; }
 }
 }
