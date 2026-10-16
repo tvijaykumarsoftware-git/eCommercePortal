@@ -34,6 +34,9 @@ public class ProductsController : ControllerBase
                 product.Price,
                 product.StockQuantity,
                 product.ImageUrl,
+                product.BackImageUrl,
+                product.LeftImageUrl,
+                product.RightImageUrl,
                 product.PlatformFee,
                 product.DiscountOnMRP
             });
@@ -57,6 +60,9 @@ public class ProductsController : ControllerBase
                 product.Price,
                 product.StockQuantity,
                 product.ImageUrl,
+                product.BackImageUrl,
+                product.LeftImageUrl,
+                product.RightImageUrl,
                 product.PlatformFee,
                 product.DiscountOnMRP
             })
@@ -103,12 +109,14 @@ public class ProductsController : ControllerBase
         existingProduct.Price = product.Price;
         existingProduct.StockQuantity = product.StockQuantity;
         existingProduct.ImageUrl = product.ImageUrl;
+        existingProduct.BackImageUrl = product.BackImageUrl;
+        existingProduct.LeftImageUrl = product.LeftImageUrl;
+        existingProduct.RightImageUrl = product.RightImageUrl;
         existingProduct.PlatformFee = product.PlatformFee;
         existingProduct.DiscountOnMRP = product.DiscountOnMRP;
         await _context.SaveChangesAsync();
         return NoContent();
     }
-
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
