@@ -18,8 +18,9 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<object>>> GetProducts([FromQuery] string? search, [FromQuery] int? categoryId)
     {
-        var products = _context.Products
+        var products = await _context.Products
             .AsNoTracking()
+            .Include(p => p.ProductImages)
             .Where(product => string.IsNullOrWhiteSpace(search)
                 || product.Name.Contains(search!)
                 || (product.Description != null && product.Description.Contains(search!)))
@@ -34,14 +35,13 @@ public class ProductsController : ControllerBase
                 product.Price,
                 product.StockQuantity,
                 product.ImageUrl,
-                product.BackImageUrl,
-                product.LeftImageUrl,
-                product.RightImageUrl,
+                ProductImages = product.ProductImages.Select(img => new { img.ImageId, img.ImageUrl }),
                 product.PlatformFee,
                 product.DiscountOnMRP
-            });
+            })
+            .ToListAsync();
 
-        return await products.ToListAsync();
+        return products;
     }
 
     [HttpGet("{id}")]
@@ -49,6 +49,7 @@ public class ProductsController : ControllerBase
     {
         var product = await _context.Products
             .AsNoTracking()
+            .Include(p => p.ProductImages)
             .Where(product => product.ProductId == id)
             .Select(product => new
             {
@@ -60,9 +61,7 @@ public class ProductsController : ControllerBase
                 product.Price,
                 product.StockQuantity,
                 product.ImageUrl,
-                product.BackImageUrl,
-                product.LeftImageUrl,
-                product.RightImageUrl,
+                ProductImages = product.ProductImages.Select(img => new { img.ImageId, img.ImageUrl }),
                 product.PlatformFee,
                 product.DiscountOnMRP
             })
@@ -100,7 +99,10 @@ public class ProductsController : ControllerBase
             return ValidationProblem(ModelState);
         }
 
-        var existingProduct = await _context.Products.FindAsync(id);
+        var existingProduct = await _context.Products
+            .Include(p => p.ProductImages)
+            .FirstOrDefaultAsync(p => p.ProductId == id);
+
         if (existingProduct == null) return NotFound();
 
         existingProduct.CategoryId = product.CategoryId;
@@ -109,11 +111,17 @@ public class ProductsController : ControllerBase
         existingProduct.Price = product.Price;
         existingProduct.StockQuantity = product.StockQuantity;
         existingProduct.ImageUrl = product.ImageUrl;
-        existingProduct.BackImageUrl = product.BackImageUrl;
-        existingProduct.LeftImageUrl = product.LeftImageUrl;
-        existingProduct.RightImageUrl = product.RightImageUrl;
         existingProduct.PlatformFee = product.PlatformFee;
         existingProduct.DiscountOnMRP = product.DiscountOnMRP;
+
+        // Sync dynamic images collection
+        _context.ProductImages.RemoveRange(existingProduct.ProductImages);
+        existingProduct.ProductImages = product.ProductImages.Select(img => new ProductImage
+        {
+            ProductId = id,
+            ImageUrl = img.ImageUrl
+        }).ToList();
+
         await _context.SaveChangesAsync();
         return NoContent();
     }

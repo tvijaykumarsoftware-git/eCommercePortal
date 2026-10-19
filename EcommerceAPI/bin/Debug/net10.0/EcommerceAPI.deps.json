@@ -16,7 +16,8 @@
           "Microsoft.AspNetCore.OpenApi": "10.0.11",
           "Microsoft.EntityFrameworkCore.SqlServer": "10.0.11",
           "Microsoft.EntityFrameworkCore.Tools": "10.0.11",
-          "Swashbuckle.AspNetCore": "10.0.1"
+          "Swashbuckle.AspNetCore": "10.0.1",
+          "System.Security.Cryptography.Pkcs": "10.0.13"
         },
         "runtime": {
           "EcommerceAPI.dll": {}
@@ -455,7 +456,8 @@
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.19.2",
           "Microsoft.SqlServer.Server": "1.0.0",
           "System.Configuration.ConfigurationManager": "9.0.11",
-          "System.IdentityModel.Tokens.Jwt": "8.19.2"
+          "System.IdentityModel.Tokens.Jwt": "8.19.2",
+          "System.Security.Cryptography.Pkcs": "10.0.13"
         },
         "runtime": {
           "lib/net9.0/Microsoft.Data.SqlClient.dll": {
@@ -1035,6 +1037,22 @@
           }
         }
       },
+      "System.Security.Cryptography.Pkcs/10.0.13": {
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1326.50504"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1326.50504"
+          }
+        }
+      },
       "System.Security.Cryptography.ProtectedData/9.0.11": {
         "runtime": {
           "lib/net9.0/System.Security.Cryptography.ProtectedData.dll": {
@@ -1519,6 +1537,13 @@
       "sha512": "sha512-roR+5AeOpflUxJQlqSfsZs/Bvi1uw4KBuTkIgF1e8l0RdalG4AUn84+sjJLclEfOV85gAjc8+Pp540qjDE5UIg==",
       "path": "system.memory.data/10.0.10",
       "hashPath": "system.memory.data.10.0.10.nupkg.sha512"
+    },
+    "System.Security.Cryptography.Pkcs/10.0.13": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-a+EovgC1fBnwdlQ6cn3j4JFBfKqiFaFvoAhjisOoSvazLAcIznaBzPQP0oYnvccmeXfqUH1KebVZOxSeH6rMaw==",
+      "path": "system.security.cryptography.pkcs/10.0.13",
+      "hashPath": "system.security.cryptography.pkcs.10.0.13.nupkg.sha512"
     },
     "System.Security.Cryptography.ProtectedData/9.0.11": {
       "type": "package",
