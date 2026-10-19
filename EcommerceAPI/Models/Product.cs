@@ -28,7 +28,7 @@ namespace EcommerceAPI.Models
     public string? ImageUrl { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    // Added Missing Columns
+
     [Column(TypeName = "decimal(18,2)")]
     public decimal? PlatformFee { get; set; }
 
@@ -41,7 +41,10 @@ namespace EcommerceAPI.Models
     [JsonIgnore]
     public Category? Category { get; set; }
 
-    // Navigation Properties
+    // Dynamic Multi-Images Navigation Property
+    [ValidateNever]
+    public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+
     [ValidateNever]
     [JsonIgnore]
     public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
@@ -49,14 +52,5 @@ namespace EcommerceAPI.Models
     [ValidateNever]
     [JsonIgnore]
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
-    [StringLength(500)]
-    public string? BackImageUrl { get; set; }
-
-    [StringLength(500)]
-    public string? LeftImageUrl { get; set; }
-
-    [StringLength(500)]
-    public string? RightImageUrl { get; set; }
 }
 }
