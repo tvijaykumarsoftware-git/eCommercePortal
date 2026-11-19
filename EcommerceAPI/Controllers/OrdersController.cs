@@ -181,138 +181,147 @@ public async Task<IActionResult> RateOrder(int id, [FromBody] RateOrderRequest r
     }
 }
 
- [HttpPost]
-public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest request)
-{
-    var userId = GetUserId();
-    if (userId == null) return Unauthorized();
-
-    if (string.IsNullOrWhiteSpace(request.ShippingAddress))
-    {
-        return BadRequest(new { message = "Shipping address is required." });
-    }
-
-    await using var transaction = await _context.Database.BeginTransactionAsync();
-
-    try
-    {
-        var cartItems = await _context.CartItems
-            .Include(item => item.Product)
-            .Where(item => item.UserId == userId.Value)
-            .ToListAsync();
-
-        if (cartItems.Count == 0)
+        [HttpPost]
+        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest request)
         {
-            return BadRequest(new { message = "Your cart is empty." });
-        }
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-        if (cartItems.Any(item => item.Quantity > item.Product.StockQuantity))
-        {
-            return BadRequest(new { message = "One or more products no longer have enough stock." });
-        }
-
-        // 1. Create the Order
-        var order = new Order
-        {
-            UserId = userId.Value,
-            ShippingAddress = request.ShippingAddress.Trim(),
-            TotalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity),
-            OrderStatus = "Pending",
-            OrderItems = cartItems.Select(item => new OrderItem
+            if (string.IsNullOrWhiteSpace(request.ShippingAddress))
             {
-                ProductId = item.ProductId,
-                UnitPrice = item.Product.Price,
-                Quantity = item.Quantity
-            }).ToList()
-        };
+                return BadRequest(new { message = "Shipping address is required." });
+            }
 
-        // 2. Deduct Stock Quantities
-        foreach (var cartItem in cartItems)
-        {
-            cartItem.Product.StockQuantity -= cartItem.Quantity;
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // Fetch cart items, optionally filtered by explicit CartItemIds from the checkout request
+                var cartQuery = _context.CartItems
+                    .Include(item => item.Product)
+                    .Where(item => item.UserId == userId.Value);
+
+                if (request.CartItemIds != null && request.CartItemIds.Any())
+                {
+                    cartQuery = cartQuery.Where(item => request.CartItemIds.Contains(item.CartItemId));
+                }
+
+                var cartItems = await cartQuery.ToListAsync();
+
+                if (cartItems.Count == 0)
+                {
+                    return BadRequest(new { message = "Your cart is empty or contains no valid available items." });
+                }
+
+                if (cartItems.Any(item => item.Quantity > item.Product.StockQuantity))
+                {
+                    return BadRequest(new { message = "One or more products no longer have enough stock." });
+                }
+
+                // 1. Create the Order
+                var order = new Order
+                {
+                    UserId = userId.Value,
+                    ShippingAddress = request.ShippingAddress.Trim(),
+                    TotalAmount = cartItems.Sum(item => item.Product.Price * item.Quantity),
+                    OrderStatus = "Pending",
+                    OrderItems = cartItems.Select(item => new OrderItem
+                    {
+                        ProductId = item.ProductId,
+                        UnitPrice = item.Product.Price,
+                        Quantity = item.Quantity
+                    }).ToList()
+                };
+
+                // 2. Deduct Stock Quantities for checked-out items only
+                foreach (var cartItem in cartItems)
+                {
+                    cartItem.Product.StockQuantity -= cartItem.Quantity;
+                }
+
+                _context.Orders.Add(order);
+
+                // Remove ONLY the processed cart items, leaving sold-out items in the cart
+                _context.CartItems.RemoveRange(cartItems);
+                await _context.SaveChangesAsync();
+
+                // 3. Create Transaction with payment details & EMI fields
+                string provider = string.IsNullOrWhiteSpace(request.PaymentProvider)
+                    ? "Credit / Debit Card"
+                    : request.PaymentProvider;
+
+                string randomTenDigits = Random.Shared.NextInt64(1000000000L, 10000000000L).ToString();
+
+                var paymentTransaction = new Transaction
+                {
+                    OrderId = order.OrderId,
+                    PaymentProvider = provider,
+                    TransactionReference = $"TXN{randomTenDigits}",
+                    Amount = order.TotalAmount,
+                    Status = provider.Equals("Cash on Delivery", StringComparison.OrdinalIgnoreCase) ? "Pending" : "Completed",
+                    ProcessedAt = DateTime.UtcNow,
+                    VendorName = request.VendorName,
+                    CardNumber = request.CardNumber,
+                    CardExp = request.CardExp,
+                    CardCvv = request.CardCvv,
+                    EmiTenure = request.EmiTenure,
+                    EmiAmount = request.EmiAmount,
+                    EmiDateOn = request.EmiDateOn
+                };
+
+                _context.Transactions.Add(paymentTransaction);
+
+                // 4. Create Invoice
+                var invoice = new Invoice
+                {
+                    OrderId = order.OrderId,
+                    InvoiceNumber = $"INV-{order.OrderId:D8}",
+                    InvoiceDate = DateTime.UtcNow
+                };
+
+                _context.Invoices.Add(invoice);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok(new
+                {
+                    orderId = order.OrderId,
+                    invoiceId = invoice.InvoiceId,
+                    invoiceNumber = invoice.InvoiceNumber,
+                    invoiceUrl = $"/api/Invoices/generate/{order.OrderId}",
+                    transaction = new
+                    {
+                        paymentTransaction.TransactionId,
+                        paymentTransaction.PaymentProvider,
+                        paymentTransaction.TransactionReference,
+                        paymentTransaction.Amount,
+                        paymentTransaction.Status,
+                        paymentTransaction.ProcessedAt,
+                        paymentTransaction.VendorName,
+                        paymentTransaction.CardNumber,
+                        paymentTransaction.CardExp,
+                        paymentTransaction.CardCvv,
+                        paymentTransaction.EmiTenure,
+                        paymentTransaction.EmiAmount,
+                        paymentTransaction.EmiDateOn
+                    },
+                    message = "Order placed successfully.",
+                    orderItems = order.OrderItems.Select(item => new
+                    {
+                        item.OrderItemId,
+                        item.ProductId,
+                        item.UnitPrice,
+                        item.Quantity
+                    })
+                });
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { message = "An error occurred while processing your order." });
+            }
         }
-
-        _context.Orders.Add(order);
-        _context.CartItems.RemoveRange(cartItems);
-        await _context.SaveChangesAsync();
-
-        // 3. Create Transaction with payment details & EMI fields
-        string provider = string.IsNullOrWhiteSpace(request.PaymentProvider) 
-            ? "Credit / Debit Card" 
-            : request.PaymentProvider;
-
-        string randomTenDigits = Random.Shared.NextInt64(1000000000L, 10000000000L).ToString();
-
-        var paymentTransaction = new Transaction
-        {
-            OrderId = order.OrderId,
-            PaymentProvider = provider,
-            TransactionReference = $"TXN{randomTenDigits}",
-            Amount = order.TotalAmount,
-            Status = provider.Equals("Cash on Delivery", StringComparison.OrdinalIgnoreCase) ? "Pending" : "Completed",
-            ProcessedAt = DateTime.UtcNow,
-            VendorName = request.VendorName,
-            CardNumber = request.CardNumber,
-            CardExp = request.CardExp,
-            CardCvv = request.CardCvv,
-            EmiTenure = request.EmiTenure,
-            EmiAmount = request.EmiAmount,
-            EmiDateOn = request.EmiDateOn
-        };
-
-        _context.Transactions.Add(paymentTransaction);
-
-        // 4. Create Invoice
-        var invoice = new Invoice
-        {
-            OrderId = order.OrderId,
-            InvoiceNumber = $"INV-{order.OrderId:D8}",
-            InvoiceDate = DateTime.UtcNow
-        };
-
-        _context.Invoices.Add(invoice);
-
-        await _context.SaveChangesAsync();
-        await transaction.CommitAsync();
-
-        return Ok(new
-        {
-            orderId = order.OrderId,
-            invoiceId = invoice.InvoiceId,
-            invoiceNumber = invoice.InvoiceNumber,
-            invoiceUrl = $"/api/Invoices/generate/{order.OrderId}",
-            transaction = new
-            {
-                paymentTransaction.TransactionId,
-                paymentTransaction.PaymentProvider,
-                paymentTransaction.TransactionReference,
-                paymentTransaction.Amount,
-                paymentTransaction.Status,
-                paymentTransaction.ProcessedAt,
-                paymentTransaction.VendorName,
-                paymentTransaction.CardNumber,
-                paymentTransaction.CardExp,
-                paymentTransaction.CardCvv,
-                paymentTransaction.EmiTenure,
-                paymentTransaction.EmiAmount,
-                paymentTransaction.EmiDateOn
-            },
-            message = "Order placed successfully.",
-            orderItems = order.OrderItems.Select(item => new
-            {
-                item.OrderItemId,
-                item.ProductId,
-                item.UnitPrice,
-                item.Quantity
-            })
-        });
-    }
-    catch (Exception)
-    {
-        await transaction.RollbackAsync();
-        return StatusCode(500, new { message = "An error occurred while processing your order." });
-    }
-}
 
         private int? GetUserId()
         {
@@ -332,7 +341,8 @@ public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest reques
     public int? EmiTenure { get; set; }
     public decimal? EmiAmount { get; set; }
     public DateTime? EmiDateOn { get; set; }
-}
+    public List<int>? CartItemIds { get; set; }
+    }
 
     public class UpdateStatusRequest
 {
