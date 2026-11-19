@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Data;
 using EcommerceAPI.Models;
+using System.Text.Json.Serialization;
 
 namespace EcommerceAPI.Controllers
 {
@@ -25,62 +26,68 @@ namespace EcommerceAPI.Controllers
             var userId = GetUserId();
             if (userId == null) return Unauthorized();
 
-            return await _context.CartItems
+            var items = await _context.CartItems
                 .AsNoTracking()
                 .Where(item => item.UserId == userId.Value)
+                .Include(item => item.Product)
                 .OrderBy(item => item.AddedAt)
+                .ThenBy(item => item.CartItemId)
                 .Select(item => new
                 {
-                    item.CartItemId,
-                    item.ProductId,
-                    item.Quantity,
-                    ProductName = item.Product.Name,
-                    PlatformFee = item.Product.PlatformFee ?? 0,
-                    DiscountOnMRP = item.Product.DiscountOnMRP ?? 0,
-                    item.Product.Price,
-                    item.Product.ImageUrl,
-                    item.Product.StockQuantity,
-                    
+                    cartItemId = item.CartItemId,
+                    productId = item.ProductId,
+                    quantity = item.Quantity,
+                    productName = item.Product.Name,
+                    price = item.Product.Price,
+                    discountOnMRP = item.Product.DiscountOnMRP ?? 0,
+                    imageUrl = item.Product.ImageUrl,
+                    stockQuantity = item.Product.StockQuantity,
+                    isEMI = item.Product.IsEMI, // Match exact casing or handle in frontend
                 })
                 .ToListAsync();
+
+            return Ok(items);
         }
 
+
+        // POST /api/cart — inserts ONE row per unit
         [HttpPost]
         public async Task<ActionResult> AddToCart([FromBody] AddCartItemRequest request)
         {
             var userId = GetUserId();
             if (userId == null) return Unauthorized();
-            if (request.Quantity < 1) return BadRequest(new { message = "Quantity must be at least 1." });
+
+            if (request == null || request.ProductId <= 0)
+                return BadRequest(new { message = "Invalid product request." });
+            if (request.Quantity < 1)
+                return BadRequest(new { message = "Quantity must be at least 1." });
 
             var product = await _context.Products.FindAsync(request.ProductId);
             if (product == null) return NotFound(new { message = "Product not found." });
 
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(item => item.UserId == userId.Value && item.ProductId == request.ProductId);
-            var requestedQuantity = (cartItem?.Quantity ?? 0) + request.Quantity;
-            if (requestedQuantity > product.StockQuantity)
-            {
-                return BadRequest(new { message = "There is not enough stock available." });
-            }
+            int currentQty = await _context.CartItems
+                .Where(item => item.UserId == userId.Value && item.ProductId == request.ProductId)
+                .SumAsync(item => (int?)item.Quantity) ?? 0;
 
-            if (cartItem == null)
+            if (currentQty + request.Quantity > product.StockQuantity)
+                return BadRequest(new { message = "There is not enough stock available." });
+
+            for (int i = 0; i < request.Quantity; i++)
             {
                 _context.CartItems.Add(new CartItem
                 {
                     UserId = userId.Value,
                     ProductId = request.ProductId,
-                    Quantity = request.Quantity
+                    Quantity = 1,
+                    AddedAt = DateTime.UtcNow
                 });
-            }
-            else
-            {
-                cartItem.Quantity = requestedQuantity;
             }
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "Product added to cart." });
         }
 
+        // DELETE /api/cart/{id} — deletes ONLY the row with this CartItemId
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveFromCart(int id)
         {
@@ -105,7 +112,10 @@ namespace EcommerceAPI.Controllers
 
     public class AddCartItemRequest
     {
+        [JsonPropertyName("productId")]
         public int ProductId { get; set; }
+
+        [JsonPropertyName("quantity")]
         public int Quantity { get; set; } = 1;
     }
 }
