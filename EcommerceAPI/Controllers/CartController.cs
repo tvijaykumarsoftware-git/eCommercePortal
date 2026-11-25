@@ -40,6 +40,7 @@ namespace EcommerceAPI.Controllers
                     productName = item.Product.Name,
                     price = item.Product.Price,
                     discountOnMRP = item.Product.DiscountOnMRP ?? 0,
+                    platformFee = item.Product.PlatformFee ?? 0,
                     imageUrl = item.Product.ImageUrl,
                     stockQuantity = item.Product.StockQuantity,
                     isEMI = item.Product.IsEMI, // Match exact casing or handle in frontend
