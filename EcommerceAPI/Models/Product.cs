@@ -8,49 +8,52 @@ namespace EcommerceAPI.Models
     [Table("Products")]
     public class Product
 {
-    [Key]
-    public int ProductId { get; set; }
+        [Key]
+        public int ProductId { get; set; }
 
-    public int CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
-    [Required]
-    [StringLength(150)]
-    public string Name { get; set; } = string.Empty;
+        [Required]
+        [StringLength(150)]
+        public string Name { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+        public string? Description { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal Price { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; }
 
-    public int StockQuantity { get; set; } = 0;
+        public int StockQuantity { get; set; } = 0;
 
-    [StringLength(500)]
-    public string? ImageUrl { get; set; }
+        [StringLength(500)]
+        public string? ImageUrl { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal? PlatformFee { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? PlatformFee { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal? DiscountOnMRP { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? DiscountOnMRP { get; set; }
 
-    // Foreign Key Navigation
-    [ForeignKey(nameof(CategoryId))]
-    [ValidateNever]
-    [JsonIgnore]
-    public Category? Category { get; set; }
+        // New IsEMI property
+        public bool IsEMI { get; set; } = false;
 
-    // Dynamic Multi-Images Navigation Property
-    [ValidateNever]
-    public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+        // Foreign Key Navigation
+        [ForeignKey(nameof(CategoryId))]
+        [ValidateNever]
+        [JsonIgnore]
+        public Category? Category { get; set; }
 
-    [ValidateNever]
-    [JsonIgnore]
-    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        // Dynamic Multi-Images Navigation Property
+        [ValidateNever]
+        public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
-    [ValidateNever]
-    [JsonIgnore]
-    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-}
+        [ValidateNever]
+        [JsonIgnore]
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+
+        [ValidateNever]
+        [JsonIgnore]
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    }
 }

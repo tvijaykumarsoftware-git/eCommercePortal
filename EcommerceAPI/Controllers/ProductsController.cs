@@ -37,7 +37,8 @@ public class ProductsController : ControllerBase
                 product.ImageUrl,
                 ProductImages = product.ProductImages.Select(img => new { img.ImageId, img.ImageUrl }),
                 product.PlatformFee,
-                product.DiscountOnMRP
+                product.DiscountOnMRP,
+                product.IsEMI
             })
             .ToListAsync();
 
@@ -63,7 +64,8 @@ public class ProductsController : ControllerBase
                 product.ImageUrl,
                 ProductImages = product.ProductImages.Select(img => new { img.ImageId, img.ImageUrl }),
                 product.PlatformFee,
-                product.DiscountOnMRP
+                product.DiscountOnMRP,
+                product.IsEMI
             })
             .SingleOrDefaultAsync();
 
@@ -113,6 +115,7 @@ public class ProductsController : ControllerBase
         existingProduct.ImageUrl = product.ImageUrl;
         existingProduct.PlatformFee = product.PlatformFee;
         existingProduct.DiscountOnMRP = product.DiscountOnMRP;
+        existingProduct.IsEMI = product.IsEMI;
 
         // Sync dynamic images collection
         _context.ProductImages.RemoveRange(existingProduct.ProductImages);
@@ -125,6 +128,7 @@ public class ProductsController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
